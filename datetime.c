@@ -24,7 +24,7 @@ int isLeapYear(int Year)
 }
 
 
-/*int isLeapYear(int Year) //OLD
+/*int isLeapYear(int Year) //Old version, same functionality but not optimized
 {
     if (Year % 4)
         return 0;
