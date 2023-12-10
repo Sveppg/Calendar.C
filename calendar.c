@@ -24,11 +24,12 @@ void createAppointment()
     countAppointments++;
     waitForEnter();
 }
-void editAppointment()
+void editAppointment(int *AppC)
 {
-    //printf("Which Appointment do you want to edit?\n");
-    //AppC = scanf("%i", &AppC);    
-
+    int *AppC = malloc(int(sizeof));
+    printf("Which Appointment do you want to edit?\n"); //Check for appList
+    AppC = scanf("%d", &AppC); 
+    
     printf("ToDo: editAppointment\n");
     waitForEnter();
 }
