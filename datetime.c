@@ -23,25 +23,6 @@ int isLeapYear(int Year)
         return 0;  // Not a leap year
 }
 
-
-/*int isLeapYear(int Year) //Old version, same functionality but not optimized
-{
-    if (Year % 4)
-        return 0;
-    else
-    {
-        if (Year % 100)
-            return 1;
-        else
-        {
-            if (Year % 400)
-                return 0;
-            else
-                return 1;
-        }
-    }
-}*/
-
 int isDateValid(sDate *Date) 
 {
     int leapYear = isLeapYear(Date->Year);
