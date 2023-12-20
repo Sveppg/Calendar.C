@@ -9,5 +9,9 @@
 
 int saveCalendar()
 {
-    
+    int AppPrint(int *AppC, char stat[36])
+    {
+        
+    }
+    return AppointCo;
 }
