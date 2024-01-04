@@ -5,11 +5,11 @@ exe = main
 
 all: clean comp obj run
 
-comp:
+comp: $(.c-file) 
 	@$(cc) -c $(.c-file) 
-obj:
+obj: $(.c-file
 	@$(cc) -o $(exe)  $(.o-file)
-run: 
+run: $(exe) 
 	./$(exe)
-clean:
+clean: $(exe) $(.o-file)
 	@rm -f $(exe) $(.o-file)
