@@ -7,7 +7,7 @@ all: clean comp obj run
 
 comp: $(.c-file) 
 	@$(cc) -c $(.c-file) 
-obj: $(.c-file
+obj: $(.o-file
 	@$(cc) -o $(exe)  $(.o-file)
 run: $(exe) 
 	./$(exe)
