@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "calendar.h"
 
 // Funktion zum Speichern eines Termins in einer Datei
 void saveAppointment(FILE* file, Appointment* appointment) {
