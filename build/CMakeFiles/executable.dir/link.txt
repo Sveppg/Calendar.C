@@ -1,1 +1,0 @@
-/usr/bin/cc  -pthread -Wall -lm -Werror -ggdb3  -rdynamic CMakeFiles/executable.dir/SOURCE_FILES/calendar.c.o CMakeFiles/executable.dir/SOURCE_FILES/datetime.c.o CMakeFiles/executable.dir/SOURCE_FILES/main.c.o CMakeFiles/executable.dir/SOURCE_FILES/menu.c.o CMakeFiles/executable.dir/SOURCE_FILES/tools.c.o -o executable 
