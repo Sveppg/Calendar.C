@@ -1,230 +1,219 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h> 
+#include <string.h>
 #include <math.h>
-#include <stdio.h> //
-#include <stdlib.h> // vers.2
-#include <string.h> //
-
 #include "datastructure.h"
 #include "tools.h"
-#include "calendar.h"
-#include "datetime.h"
-#include "menu.h"
-#include "escapesequenzen.h"
+ 
 
+int dayOfWeek(sDate *date){
+    static int jMonth[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
+    int d = date->Day;
+    int m = date->Month;
+    int y = date->Year;
 
+    if(m < 3) y--;
 
-
-int isLeapYear(int Year)
-{
-    if ((Year % 4 == 0 && Year % 100 != 0) || (Year % 400 == 0))
-        return 1;  // Leap year
-    else
-        return 0;  // Not a leap year
+    return(y + (y/4) - (y/100) + (y/400) + jMonth[m - 1] + d) % 7;
 }
 
-int isDateValid(sDate *Date) 
-{
-    int leapYear = isLeapYear(Date->Year);
-    if (Date->Year > 9999 || Date->Year <= 0)
-        return 0;
-    if (Date->Month > 12 || Date->Month <= 0)
-        return 0;
-    if (Date->Day <= 0)
-        return 0;
-    if (Date->Month == 4 || Date->Month == 6 || Date->Month == 9 || Date->Month == 11)
-    {
-        if (Date->Day > 30)
-            return 0;
+
+int isLeapYear(int year){
+    return (((year % 4 == 0) &&  (year % 100 != 0)) || ((year % 100 == 0 && year % 400 == 0)));
+}
+
+
+int isDateValid(sDate Date){
+    int isDay;
+
+    switch(Date.Month){
+        case 1: isDay = 31; break;
+        case 2: if(isLeapYear(Date.Year) == 1) isDay = 29; else isDay = 28; break;
+        case 3: isDay = 31; break;
+        case 4: isDay = 30; break;
+        case 5: isDay = 31; break;
+        case 6: isDay = 30; break;
+        case 7: isDay = 31; break;
+        case 8: isDay = 31; break;
+        case 9: isDay = 30; break;
+        case 10: isDay = 31; break;
+        case 11: isDay = 30; break;
+        case 12: isDay = 31;break;
+        default: isDay = 0;
     }
-    else
-    {
-        if (Date->Day > 31)
-            return 0;
-    }
-    if (Date->Day >= 29 && Date->Month == 2 && leapYear != 1)
-        return 0;
-    else
+    if(((Date.Day < 1) || (Date.Day > isDay) || (Date.Year < 1)) == 0){
         return 1;
-
+    }
+    else return 0;
 }
 
-int isTimeValid(sTime *Time)
-{
-    if (Time->Hour > 24 || Time->Hour < 0)
-    {
-        printf("hours failed\n");
-        return 0;
+
+int getDateFromString(char *in, sDate *dateptr){                            
+    int counter = 0;                                                        
+    int j = 0;                                                              
+    char point = '.';                                                       
+    char read[20];                                                        
+                                                                            
+    for(int i = 0;counter<3;i++){                                           
+        if(in[i] == point || in[i] == NULL){               
+            if(counter == 0) dateptr->Day = atoi(read);
+            else if(counter == 1) dateptr->Month = atoi(read);
+            else if(counter == 2) dateptr->Year = atoi(read);
+
+            counter++;
+            j = 0;
+        }
+        else{
+            read[j] = in[i];
+            read[j+1] = '\0';
+            j++;
+        }
+
+        if(in[i] == NULL){
+            if(isDateValid(*dateptr)){
+                dateptr->WeekDay = dayOfWeek(dateptr);
+                return 1;
+            }
+            else return 0;
+        }
     }
-    if (Time->Minute > 60 || Time->Minute < 0)
-    {
-        printf("Minutes failed\n");
-        return 0;
-    }
-    if (Time->Second > 60 || Time->Second < 0)
-    { 
-        printf("Seconds failed\n");
-        return 0;
-    }
-    else   
+}
+
+
+int getDate(char *prompt, sDate *dateptr){
+    char in[20];
+    dateptr = calloc(1, sizeof(sDate));
+
+    if(dateptr != NULL){
+        do{
+            printf(prompt);
+            scanf("%s", in);
+            clearBuffer();
+        }while(getDateFromString(in, dateptr) != 1);
+        Calendar[countAppointments].Date = *dateptr;
         return 1;
-}
-int calculateWeekDay(sDate *Date)
-{
-    double wDouble, d, m, y, c;
-    int year;
-    d = Date->Day;
-    year = Date->Year;
-    switch (Date->Month)
-    {
-        case 1: m = 11; break;
-        case 2: m = 12; break;
-        case 3: m = 1; break;
-        case 4: m = 2; break;
-        case 5: m = 3; break;
-        case 6: m = 4; break;
-        case 7: m = 5; break;
-        case 8: m = 6; break;
-        case 9: m = 7; break;
-        case 10: m = 8; break;
-        case 11: m = 9; break;
-        case 12: m = 10; break;
     }
-    if (Date->Month == 1 || Date->Month == 2)
-    {
-        year -= year;
+    else{
+        printf("Kein Speicher vorhanden. Mit einem Upgrade auf iCloud+ erhalten Sie auf diverse Geraete mehr Speicher und zusaetzliche Funktionen, wie 'iCloud Privat-Relay', 'E-Mail Adresse verbergen' und 'HomeKit Secure Video'. Sie koennen sogar ihr Abo mit Ihrer Familie teilen. Weitere Infos finden Sie auf apple.de/icloud");
+        enter(2);
+        waitForEnter("Zum Fortfahren druecken Sie die Eingabetaste...");
+        return 0;
     }
-    for (int i = 0; i <= 3; i++)
-    {
-        y = (year % 100);
-        c = (year / 100);
-    }
-    wDouble = (d + floor((2.6 * m) - 0.2 ) + y + floor(y/4) + floor(c/4) - (2*c));
-    int weekDay;
-    weekDay = wDouble;
-    weekDay = weekDay % 7;
-    while (weekDay < 0)
-        weekDay += 7;
-    if (weekDay == 0)
-        weekDay = 7;
-    return weekDay;
-}
-
-int getDateFromString(char *Input, sDate *Date)
-{
-    int Day, Month;
-    long int Year;
-
-    char DayStr[3], MonthStr[3], YearStr[5];
-    
-    if (sscanf(Input, "%2[^.].%2[^.].%4[^.]", DayStr, MonthStr, YearStr) != 3) {
-       // schau mal der gibt das auch nach getDauer aus  printf("Entschuldige, ein falsches Zeitformat wurde verwendet, verwende DD.MM.YYYY\n");
-        return 0; // Fehler Übergabe type
-    }
-
-    // Überprüfe länge der parameter = Day == 2 , month == 2, year == 4
-    if (strlen(DayStr) > 2 || strlen(MonthStr) > 2 || strlen(YearStr) != 4) {
-        return 0; // False = Inkorrekte Länge
-    }
-
-    // Übersetze in int
-    Day = atoi(DayStr);
-    Month = atoi(MonthStr);
-    Year = strtol(YearStr, NULL, 10);
-
-    //überprüfe richtige Anzahl pro parameter
-    if (Day < 1 || Day > 31 || Month < 1 || Month > 12 || Year < 1000 || Year > 9999) {
-        return 0; // return false = falsche länge
-    }
-
-    // Übergebe datentypen zu datastruct
-    Date->Day = Day;
-    Date->Month = Month;
-    Date->Year = (int)Year;
-    Date->weekDay = calculateWeekDay(Date);
-
-    return isDateValid(Date);
 }
 
 
-int getTimeFromString(char *Input, sTime *Time) // ver1.
-{
-    int Hour, Minute, Second;
+int isTimeValid(sTime Time){
+    int isHourValid = (Time.Hour >= 0) && (Time.Hour <= 23);
+    int isMinuteValid = (Time.Minute >= 0) && (Time.Minute <= 59);
 
-    char HourStr[3], MinuteStr[3], SecondStr[3];
-    
-    if (sscanf(Input, "%2[^:]:%2[^:]:%2[^:]", HourStr, MinuteStr, SecondStr) != 3) {
-        // same as in get date printf("Entschuldige, ein falsches Zeitformat wurde verwendet, verwende HH:MM:SS\n");
-        return 0; // Parsing error
-    }
-
-    // überprüfe Länge für übergebene Strings
-    if ((strlen(HourStr) > 2) || (strlen(MinuteStr) > 2) || (strlen(SecondStr) > 2)) {
-        return 0; // Inkorrekte Länge
-    }
-
-    // übertrage als integer
-    Hour = atoi(HourStr);
-    Minute = atoi(MinuteStr);
-    Second = atoi(SecondStr);
-
-   
-    if (Hour < 0 || Hour > 24 || Minute < 0 || Minute > 60 || Second < 0 || Second > 60) {
-        return 0; //Werte passen nicht
-    }
-
-    // Übertrage werte zu time struc
-    Time->Hour = Hour;
-    Time->Minute = Minute;
-    Time->Second = Second;
-
-    return isTimeValid(Time);
+    return (isHourValid && isMinuteValid);
 }
 
 
+int getTimeFromString(char *in, sTime *timeptr){                            
+    int counter = 0;                                                        
+    int j = 0;                                                              
+    char point = ':';                                                       
+    char read[20];                                                        
+                                                                            
+    for(int i = 0;counter<2;i++){                                           
+        if(in[i] == point || in[i] == NULL){               
+            if(counter == 0) timeptr->Hour = atoi(read);
+            else if(counter == 1) timeptr->Minute = atoi(read);
 
-
-void getDate(char prompt[], sDate *Date)
-{
-    char Input[20];
-    do
-    {
-        printf("%s", prompt); 
-        *Input = '\0';
-        scanf("%19[^\n]", Input);
-        clearBuffer();
-    } while (getDateFromString(Input, Date) == 0);      
-}
-
-void getTime(char prompt[], sTime *Time, int Optional)
-{
-    char Input[20];
-    do
-    {
-        printf("%s", prompt);
-        *Input = '\0';
-        scanf("%19[^\n]", Input);
-        clearBuffer();
-    } while (getTimeFromString(Input, Time) == 0 && Optional == 0);
-}
-
-void printDate(sAppointment *Appointment)
-{
-    switch (Appointment->Date.weekDay)
-    {
-        case 0: printf("Not a Day"); break;
-        case 1: printf("Mo"); break;
-        case 2: printf("Tu"); break;
-        case 3: printf("We"); break;
-        case 4: printf("Th"); break;
-        case 5: printf("Fr"); break;
-        case 6: printf("Sa"); break;
-        case 7: printf("Su"); break;
+            counter++;
+            j = 0;
+        }
+        else{
+            read[j] = in[i];
+            read[j+1] = '\0';
+            j++;
+        }
+        if(in[i] == NULL) return isTimeValid(*timeptr);
     }
-    printf(", %02i.%02i.%04i:\n", Appointment->Date.Day, Appointment->Date.Month, Appointment->Date.Year);
 }
 
-void printTime(sAppointment *Appointment)
-{
-    printf("%2i:%02i", Appointment->Time.Hour, Appointment->Time.Minute);
+
+int isTimeValidLite(sTime Time){
+    int isHourValid = (Time.Hour >= 0);
+    int isMinuteValid = (Time.Minute >= 0) && (Time.Minute <= 60);
+    int isSecondValid = (Time.Second >= 0) && (Time.Second <= 60);
+
+    return (isHourValid && isMinuteValid && isSecondValid);
+}
+
+
+int getTimeFromStringLite(char *in, sTime *timeptr){                            
+    int counter = 0;                                                        
+    int j = 0;                                                              
+    char point = ':';                                                       
+    char read[20];                                                        
+                                                                            
+    for(int i = 0;counter<3;i++){                                           
+        if(in[i] == point || in[i] == NULL){               
+            if(counter == 0) timeptr->Hour = atoi(read);
+            else if(counter == 1) timeptr->Minute = atoi(read);
+            else if(counter == 2) timeptr->Second = atoi(read);
+
+            counter++;
+            j = 0;
+        }
+        else{
+            read[j] = in[i];
+            read[j+1] = '\0';
+            j++;
+        }
+        if(in[i] == NULL) return isTimeValidLite(*timeptr);
+    }
+}
+
+int getTime(char *prompt, sTime *timeptr){
+    char in[20];
+    timeptr = calloc(1, sizeof(sTime));
+
+    if(timeptr != NULL){
+        do{
+            printf(prompt);
+            scanf("%s", in);
+            clearBuffer();
+        }while(getTimeFromString(in, timeptr) != 1);
+        Calendar[countAppointments].Time = *timeptr;
+        return 1;
+    }
+    else{
+        printf("Kein Speicher vorhanden. Mit einem Upgrade auf iCloud+ erhalten Sie auf diverse Geraete mehr Speicher und zusaetzliche Funktionen, wie 'iCloud Privat-Relay', 'E-Mail Adresse verbergen' und 'HomeKit Secure Video'. Sie koennen sogar ihr Abo mit Ihrer Familie teilen. Weitere Infos finden Sie auf apple.de/icloud");
+        enter(2);
+        waitForEnter("Zum Fortfahren druecken Sie die Eingabetaste...");
+        return 0;
+    }
+}
+
+int getDuration(char *prompt, sTime *timeptr){
+    char in[20];
+    int Len;
+    timeptr = calloc(1, sizeof(sTime));
+
+    if(timeptr != NULL){
+        do{
+            printf(prompt);
+            scanf("%[^\n]", in);
+            clearBuffer();
+            Len = strlen(in);
+        }while(!(getTimeFromStringLite(in, timeptr)) && (Len != 0));
+        return 1;
+    }
+    else{
+        printf("Kein Speicher vorhanden. Mit einem Upgrade auf iCloud+ erhalten Sie auf diverse Geraete mehr Speicher und zusaetzliche Funktionen, wie 'iCloud Privat-Relay', 'E-Mail Adresse verbergen' und 'HomeKit Secure Video'. Sie koennen sogar ihr Abo mit Ihrer Familie teilen. Weitere Infos finden Sie auf apple.de/icloud");
+        enter(2);
+        waitForEnter("Zum Fortfahren druecken Sie die Eingabetaste...");
+        return 0;
+    }
+}
+
+void printDate(sDate *dateptr){
+    printf("%02i.%02i.%04i", dateptr->Day, dateptr->Month, dateptr->Year);
+}
+
+void printTime(sTime *timeptr){
+    printf("%02i:%02i", timeptr->Hour, timeptr->Minute);
 }

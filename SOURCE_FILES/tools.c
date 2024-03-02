@@ -1,101 +1,120 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-#include "escapesequenzen.h"
-#include "datastructure.h"
+#include <string.h>
 
-int getMem(int **pPtr, int Size)
-{
-	if (pPtr == NULL)
-		return 0;
-	
-	*pPtr = calloc(Size, sizeof(int));
-
-	return (*pPtr != NULL);
+void enter(int howManyTimes){
+    for(int i=0;i<howManyTimes;i++) printf("\n");
 }
 
-void freeMem(int **pPtr)
-{
-	free(*pPtr);
-	if (pPtr)
-		*pPtr = NULL;
+
+void clearScreen(){
+    system("CLS");
 }
 
-void clearBuffer()
-{
-    char Leeren;
-	do
-		scanf("%c", &Leeren);
-	while(Leeren != '\n');
+
+void clearBuffer(){
+    char dummy;
+
+    while(dummy != '\n') scanf("%c", &dummy);
 }
 
-void waitForEnter()
-{
-	char Eingabetaste;
-	printf("Bitte druecken Sie die Eingabetaste...");
-	do
-		scanf("%c", &Eingabetaste);
-	while(Eingabetaste != '\n');
+
+void fclearBuffer(FILE *file){
+    char Dummy;
+
+    do{
+        if(feof(file)) break;
+        fscanf(file, "%c", &Dummy);
+    }while(Dummy != '\n');
 }
 
-void clearScreen()
-{
-    CLEAR;
+
+int askYesOrNo(char *question){
+    char Input;
+
+    do{
+    printf("%s", question);
+      scanf("%c", &Input);
+      if (Input != '\n')   clearBuffer();
+    }while ((Input != 'j') && (Input != 'J') && (Input != 'Y') && (Input != 'y') && (Input != 'n') && (Input != 'N'));
+
+    return ((Input == 'j') || (Input == 'J') || (Input == 'Y') || (Input == 'y'));
 }
 
-int askYesOrNo(char *Question)
-{
-	char Eingabe;
-		do{
-			printf("%s", Question);
-			scanf("%c", &Eingabe);
-			clearBuffer();
-			if(Eingabe != 'J' && Eingabe != 'j' && Eingabe != 'N' && Eingabe != 'n'){
-				printf("Falsche Eingabe...\n");
-				waitForEnter();
-				LEFT(38);
-				CLEAR_LINE;
-				UP_LINE;
-				CLEAR_LINE;
-				UP_LINE;
-				CLEAR_LINE;
-				UP_LINE;
-				CLEAR_LINE;
-			}
-		}while(Eingabe != 'J' && Eingabe != 'j' && Eingabe != 'N' && Eingabe != 'n');
-		if (Eingabe == 'N' || Eingabe == 'n')
-			return 0;
-		else
-			return 1;
+
+void waitForEnter(char *text){
+    printf("%s", text);
+    clearBuffer();
 }
 
-void printLine(char sign, int length)
-{
-	int i;
-	for (i = 1; i <= length; i++)
-		printf("%c", sign);
-	printf("\n");
+
+void printLine(char look, int lenght){
+    for(int i=0; i<lenght; i++){
+        printf("%c", look);
+    }
 }
 
-void getText(char prompt[], int maxLength, char *Text[], int Optional)
-{
-	char *Input = NULL;
-	Input = calloc(maxLength, sizeof(char));
-	do
-	{
-		printf("%s", prompt);
-		*Input = '\0';
-		scanf("%99[^\n]", Input);
-		clearBuffer();
-	} while (*Input == '\0' && Optional == 0);
-	*Text = calloc(strlen(Input), sizeof(char));
-	strcpy(*Text, Input);
-	free(Input);
+
+void title(char *name, char line){
+    printf("%s", name);
+    enter(1);
+    printLine(line, strlen(name));
 }
 
-char Usage() //just to display the Outputformat for new appointments
-{
-	char Timeformat[] = "The Timeformat is DD.MM.YYYY, HH:MM:SS";
-	printf("%s\n", Timeformat);
-	return 0;
-} //Line 16 in calendar.c and Line 20 in tools.h
+
+void Dog(){
+    clearScreen();
+    printf("Dog");
+}
+
+
+int getText(char *Prompt, int Maxlen, char **Text, int AllowEmpty){
+    char *Input;
+    char Format[20];
+    unsigned Len = 0;
+    int ok = 0;
+
+    if((Text == NULL) || (Maxlen == 0)) return 0;
+    
+    *Text = NULL;
+
+    Input = malloc(Maxlen+1);
+    if(Input){
+        sprintf(Format, "%%%i[^\n]", Maxlen);
+        do{
+            printf(Prompt);
+            *Input = '\0';
+            scanf(Format, Input);
+            clearBuffer();
+
+            Len = strlen(Input);
+            if(Len > 0){
+                *Text = malloc(Len + 1);
+                if(*Text){
+                    strcpy(*Text, Input);
+                    ok = 1;
+                }
+            }
+            else if(AllowEmpty) ok = 1;
+        }while(ok != 1);
+
+        free(Input);
+        return 1;
+    }
+    else return 0;
+}
+
+int getMem(char **pPtr, int size){
+    if(pPtr == NULL)
+        return 0;
+
+    pPtr = calloc(size, 1);
+    return (*pPtr != NULL);
+}
+
+void freeMem(char **pPtr){
+    if(pPtr){
+        free(pPtr);
+        pPtr = NULL;
+    }
+}

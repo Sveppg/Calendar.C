@@ -1,35 +1,32 @@
 #ifndef DATASTRUCTURE_H
-    #define DATASTRUCTURE_H
+#define DATASTRUCTURE_H
 
-    #define MAXAPPOINTMENTS 100
+#define MAXAPPOINTMENTS 100
 
-    typedef enum {NotADay, Mo, Tu, We, Th, Fr, Sa, Su} eDayOfTheWeek;
+typedef enum {So, Mo, Di, Mi, Do, Fr, Sa} eDayofTheWeek;
 
-    typedef struct
-    {
-        int Day;
-        int Month;
-        int Year;
-        eDayOfTheWeek weekDay;
-    } sDate;
+typedef struct{
+    int Day;
+    int Month;
+    int Year;
+    eDayofTheWeek WeekDay;
+} sDate;
 
-    typedef struct
-    {
-        int Hour;
-        int Minute;
-        int Second;
-    } sTime;
-    
-    typedef struct
-    {
-        sDate Date;
-        sTime Time;
-        char *Description;
-        sTime Duration;
-        char *Place;
-    } sAppointment;
+typedef struct{
+    int Hour;
+    int Minute;
+    int Second;
+}sTime;
 
-    extern int countAppointments;
-    extern sAppointment Calendar[];
+typedef struct{
+    sDate Date;
+    sTime Time;
+    char *Description;
+    char *Location;
+    sTime *Duration;
+}sAppointment;
+
+extern int countAppointments;
+extern sAppointment Calendar[MAXAPPOINTMENTS];
 
 #endif
